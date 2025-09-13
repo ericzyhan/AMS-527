@@ -14,6 +14,7 @@
 \usepackage{bm}
 \usepackage{wrapfig} % Text flowing around figures
 \usepackage{amssymb}
+\usepackage{booktabs}
 
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{cor}[thm]{Corollary}
@@ -104,7 +105,7 @@
         \[
             \lim_{ x \to 0 } \kappa_{f}(x) = \lim_{ x \to 0 } \frac{x\sin(x)}{1-\cos(x)} -2= \lim_{ x \to 0 } \frac{x^{2}\left(1 - \frac{x^{2}}{3!}+\dots\right)}{ 1-x^{2}\left(\frac{1}{2!}-\frac{x^{2}}{4!}+\dots\right)}-2 = \frac{1}{\frac{1}{2}} - 2 = 0
         .\]
-        So, the problem is well-conditioned. The reason why direct evaluation fails near 0 is because of catastrophic cancellation. In the case of a division algorithm that uses subtraction, we run into this issue. to  As \(x\to 0\), both the numerator and denominator approach values very near to 0, and so no matter the robustness of our approximation, the catastrophic cancellation principle will result in large relative errors.
+        So, the problem is well-conditioned. The reason why direct evaluation fails near 0 is because of catastrophic cancellation. In the case of a division algorithm that uses subtraction, we run into this issue. to  As \(x\to 0\), both the numerator and denominator approach values very close to each other, and so no matter the robustness of our approximation, the catastrophic cancellation principle will result in large relative errors.
     \end{enumerate}
 
     \item \textbf{Norms and Their Properties}
@@ -134,13 +135,184 @@
         \item Using Taylor series expansions, derive the second-order centered difference formula for the second derivative:
         $$f''(x) \approx \frac{f(x+h) - 2f(x) + f(x-h)}{h^2}$$
 
-        \textbf{Solution:} 
+        \textbf{Solution:} Begin with the Taylor series expansion for \(f(x+h)\) and \(f(x-h)\),
+        \begin{gather*}
+            f(x+h) = f(x) + h\partial_{x}f + \frac{h^{2}}{2}\partial_{x}^{2}f + \frac{h^{3}}{3!}\partial_{x}^{3}f + \frac{h^{4}}{4!}\partial_{x}^{4}f \\ 
+            f(x-h) = f(x) - h\partial_{x}f + \frac{h^{2}}{2}\partial_{x}^{2}f - \frac{h^{3}}{3!}\partial_{x}^{3}f + \frac{h^{4}}{4!}\partial_{x}^{4}f.            
+        \end{gather*}
+        We add the two together to derive the central-difference method:
+        \begin{gather*}
+            f(x+h)+f(x-h) = 2f(x) + \frac{2h^{2}}{2!} \partial_{x}^{2}f + 2\frac{h^{4}}{4!}\partial_{x}^{4}f\\
+            \implies \frac{f(x+h)+f(x-h)-2f(x)}{h^{2}} = \partial_{x}^{2}f + \frac{h^{2}}{12}\partial_{x}^{4}f(x+h) \tag{1}
+        \end{gather*}
+        where \((1)\)'s last term is the truncated error.\\
+        
     
         \item Use the Lagrange form of the Taylor remainder to derive the leading term of the truncation error for this formula. What is the order of accuracy?
+
+        \textbf{Solution:} The Lagrange form of the remainder is
+        \[
+            R_{3}(x) = \frac{h^{2}}{12} \displaystyle{\partial}_{x}^{4}f(x+h)
+        .\]
+        The order of accuracy is \(O(h^{2})\).\\
     
         \item The error formula derived in part (b) requires $f$ to be sufficiently smooth (e.g., $C^4$). What happens to the error if $f$ is only $C^2$? Use the integral remainder to argue about the convergence and, if possible, the order of accuracy.
+
+        \textbf{Solution:} Intuitively, if \(f\not\in C^{4}\), then the \(O(h^{2})\) error from the Lagrange form of the remainder is not true. We can confirm this using the integral form of the remainder. To compute this, we once again add \(f(x+h)\) and \(f(x-h)\), except only up to the second order term because \(f\in C^{2}\).
+
+        We arrive at 
+        \begin{gather*}
+            f(x+h) - 2f(x) + f(x-h) = \int_x^{x+h} f''(t)(x+h-t) \, dt + \int_x^{x-h} f''(t)(x-h-t) \, dt\\
+            f(x+h) - 2f(x) + f(x-h) = \int_0^h [f''(x+s) + f''(x-s)](h-s) \, ds
+        ,\end{gather*}
+        where \(t=x+s\) in the first integral and \(t=x-s\) in the second integral. We can then divide by \(h^{2}\) in order to achieve the desired form.
+        
+        The error of the approximation is given by the difference between the difference approximation and the true value of the derivative. Thus,
+        \[
+            E(h) = \frac{1}{h^{2}} \int_{0}^{h} \left[f''(x+s)+f''(x-s)\right] (h-s) \, ds - f''(x) 
+        .\]
+        Now, recall that for measuring error convergence, we measure the size of the error as \(h \to 0\). The bracketed terms \(\left[f''(x+s)+f''(x-s)\right]\) are approximately $\left[f''(x)+f''(x)\right] = 2f''(x)$ for \(h\to 0\). So, the error now becomes
+        \[
+            E(h) = \frac{1}{h^{2}} \int_{0}^{h} 2f''(x) (h-s) \, ds - f''(x) 
+        .\]
+        We can now evaluate this integral directly.
+        \[
+            \frac{1}{h^{2}} \int_{0}^{h} 2f''(x) (h-s) \, ds = \frac{1}{h^{2}} 2f''(x) \frac{h^{2}}{2} \, ds
+        ,\]
+        which gives us
+        \[
+            E(h) = \frac{2}{h^{2}}f''(x) \frac{h^{2}}{2} \, ds - f''(x) = 0
+        .\]
+        So, somewhat miraculously, the error does converge to 0, and because the approximation is until second order, the order of accuracy is given by \(O(h^{2})\).
+        
+        
     \end{enumerate}
     
+    \item \textbf{Differentiability and Continuity}
+    \begin{enumerate}
+        \item  Is a function that is continuously differentiable (\(C^{1}\)) on a closed, bounded interval $[a,b]$ necessarily Lipschitz continuous on that interval? Justify your answer.
+
+        \textbf{Solution:} Yes. Note that necessarily, a \(C^{1}\) function on a compact set obtains a max-min value for its derivative. So, \(|f'(x)|\) is bounded. Now consider a function \(f(x)\) over \([a,b]\). The fuction can be divided into subintervals s.t. by the Mean Value Theorem,
+        \[
+            \frac{f(x)-f(y)}{x-y} = f'(\xi) \implies |f(x)-f(y)| = |f'(\xi)||x-y|
+        \]
+        for \(\xi\in(x,y)\). Because \(f'(\xi)\) is bounded, we know that the Lipschitz constant must be the upper bound of the derivative.\\
+
+        \item  Provide an example of a function that is Lipschitz continuous on the interval $[-1,1]$ but is not differentiable at every point in that interval. Explain why your example satisfies these conditions and state its Lipschitz constant.
+
+        \textbf{Solution:} Consider the function \(f(x) = |x|\). This function is Lipschitz continuous with a Lipschitz constant of 1, computable by taking the maximum of \(|f'(x)|\). However, it is not differentiable at \(x=0\).
+        
+    \end{enumerate}
+    \item \textbf{Bilinear Forms and the Inf-Sup Condition}
+    \begin{enumerate}
+        \item  The inf-sup (or LBB) condition for a bilinear form $B(u,v)$ states that its inf-sup constant, $\rho_{min}$, must be strictly positive. Define $\rho_{min}$. How does this condition relate to coercivity, and why is it a more general condition for the well-posedness of a variational problem $B(u,v) = \ell(v)$?
+
+        \textbf{Solution:} \(\rho_{min}\) is defined as the stretching factor of a bilinear operator on two possibly distinct linear spaces \(\mathcal{U}, \mathcal{V}\). Mathematically,
+        \[
+            \rho_{min} = \inf_{u\in \mathcal{U}, u \not = 0} \sup_{v\in \mathcal{V}, v \not = 0} \frac{|B(u,v)}{||u||_{\mathcal{U}}||v||_{\mathcal{V}}}
+        .\]
+
+        A bilinear form is called coercive if there exists \(c>0\) s.t. \(A(x,x)\geq c||x||^{2}\) for a linear operator \(A\) and for all \(x\in H\) a Hilbert space. One can rearrange this to obtain the inf-sup constant for exactly symmetric operators on a single Hilbert space,
+        \[
+            \frac{|A(x,x)|}{||x^{2}||_{H}} \geq c
+        ,\]
+        where \(c=\rho_{min}\).
+
+        The LBB condition states that for noncoercive operators, there exists a unique solution to the variational problem \(A(u,v) = \ell(v)\) with the fulfillment of a strictly positive \(\rho_{min}\).\\
+
+        \item Consider the bilinear form 
+            \[
+                \mathcal{B}(y,x) = y^{T}Ax
+            \]
+        with the rank-1 matrix 
+            \[
+                A = \begin{pmatrix} 
+                1 & 2 \\ 
+                2 & 4 
+                \end{pmatrix}.
+            \]
+        Show that if the domain and codomain are the full space $\mathbb{R}^{2}$, the inf-sup constant is zero. Then, identify the correct subspaces 
+            \[
+                \mathcal{U} = \mathcal{R}(A^{T}) \quad \text{and} \quad \mathcal{V} = \mathcal{R}(A)
+            \]
+        and compute the non-trivial inf-sup constant on these subspaces using the Euclidean norm $\|\cdot\|_{2}$.
+
+        \textbf{Solution:} Note that \(A\) has linearly dependent columns, so it has a nontrivial nullspace. Therefore, using \(\R^{2}\) as the full domain and codomain to calculate the inf-sup constant means that we may select \(y\in \mathcal{N}(A^{T})\) or \(x\in \mathcal{N}(A)\) to minimize \(|A(x,y)|\). Thus, we must use the new linear spaces of \(\mathcal{U} = \mathcal{R}(A^{T})\) and \(\mathcal{V} = \mathcal{R}(A)\), defined as \(\mathcal{U} = \mathcal{V} = \text{span}\left(\left[1, 2\right]^{T}\right)\).
+
+        \(\rho_{min} = \sigma_{min}(A)\) for matrices. Thus, we calculate the singular values of \(AA^{T}\).
+        \[
+            AA^{T} = \begin{bmatrix}
+                        5 & 10 \\
+                        10 & 20
+                        \end{bmatrix}
+        ,\]
+        and then calculate the eigenvalues, which are computed to be \(\lambda_{1} = 0, \lambda_{2} = 25\). We then take the square root of all eigenvalues to find the minimum singular value. \(\sigma_{1} = 0, \sigma_{2} = 5\). Since we require a strictly positive inf-sup constant for our problem to be well-posed, we select \(\rho_{min} = \sigma_{2} = 5\).
+        
+
+        
+    \end{enumerate}
+\end{enumerate}
+
+\newpage
+For the following problems, please reference the code as provided in the GitHub link provided here: https://github.com/ericzyhan/AMS-527. Follow the instructions in the README to run the code.
+
+\begin{enumerate}
+    \setcounter{enumi}{5}
+    \item \textbf{Rounding Errors in Finite Differences}
+    \begin{enumerate}
+        \item The minimum value of the magnitude of error on this plot is \(4.36\times 10^{-10}\). The value of \(h\) at which this occurs \(h = 1\times 10^{-8}\). The machine epsilon for double-precision is \(\sqrt{\epsilon_{mach}} \approx 2.22\times 10^{-8}\), which is of the same magnitude as the optimal \(h\) we calculated.
+
+        \item For double-precision, the optimal \(h\) is \(1\times 10^{-5}\). The theoretical optimal value which minimizes error is \((\epsilon_{mach})^{\frac{1}{3}} \approx 2.22 \times 10^{-5.3}\), which is approximately of the same magnitude as the optimal \(h\) calculated.
+
+        For single-precision, the optimal \(h\) is \(1\times10^{-2}\). The theoretical optimal value is \((\epsilon_{mach})^{\frac{1}{3}} \approx 0.099\), which is almost exactly the optimal \(h\).
+    \end{enumerate}
+
+\item \textbf{Rounding Errors in the Quadratic Formula}
+    \begin{enumerate}
+        \item The standard quadratic equation suffers from catastrophic cancellation in the case where the sign of \(b\) is opposite that of the sign preceding the square root of the discriminant. This is because for large \(b\), the \(b^{2}\) term underneath the square root dominates the \(-4ac\) term, and so \(\sqrt{ b^{2}-4ac }\) is almost equal to \(b\). When the sign of \(b\) is opposite that of the sign preceding the square root of the discriminant, you end up subtracting (or adding, in the negative case) two extremely close numbers, resulting in catastrophic cancellation. 
+
+        This problem is avoided with the other root because you end up adding (or subtracting, in the negative case) two close numbers, which does not result in catastrophic cancellation.
+
+        To calculate the other root, select the form of the alternative formula s.t. the sign of \(b\) matches the sign preceding the discriminant.
+
+        \item Below is the table generated by the naive algorithm.
+        \begin{center}
+            \begin{tabular}{lrr rrrr}
+            \toprule
+            \multicolumn{3}{c}{Coefficients} & \multicolumn{2}{c}{Reference Solutions} & \multicolumn{2}{c}{Approximate Solutions} \\
+            \cmidrule(r){1-3} \cmidrule(lr){4-5} \cmidrule(l){6-7}
+            $a$ & $b$ & $c$ & Root 1 & Root 2 & Root 1 & Root 2 \\
+            \midrule
+            1 & 4 & 3 & -1.0 & -3.0 & -1.0 & -3.0 \\
+            1e200 & 4e200 & 3e200 & -1.0 & -3.0 & Error & Error \\
+            0 & 2 & 8 & -4.0 & N/A & nan & -inf \\
+            1 & 1e8 & 1 & -1.00000000e-8 & -9.99999990e7 & -7.45 & -100000000 \\
+            1 & -8 & 15.99999999 & 4.00001 & 3.99999 & nan & -inf \\
+            1e-200 & -1e200 & 1e-200 & $\approx 1$e400 & $\approx 1$e-400 & Error & Error \\
+            \bottomrule
+            \end{tabular}
+        \end{center}
+
+        \item Below is the table generated by the robust algorithm.
+        \begin{center}
+            \begin{tabular}{lrr rrrr}
+            \toprule
+            \multicolumn{3}{c}{Coefficients} & \multicolumn{2}{c}{Reference Solutions} & \multicolumn{2}{c}{Approximate Solutions} \\
+            \cmidrule(r){1-3} \cmidrule(lr){4-5} \cmidrule(l){6-7}
+            $a$ & $b$ & $c$ & Root 1 & Root 2 & Root 1 & Root 2 \\
+            \midrule
+            1 & 4 & 3 & -1.0 & -3.0 & -1.0 & -3.0 \\
+            1e200 & 4e200 & 3e200 & -1.0 & -3.0 & -1.0 & -3.0 \\
+            0 & 2 & 8 & -4.0 & N/A & -4.0 & N/A \\
+            1 & 1e8 & 1 & -1.00000000e-8 & -9.99999990e7 & -1.00000000e-8 & -9.99999990e7 \\
+            1 & -8 & 15.99999999 & 4.00001 & 3.99999 & 4.00031 & 3.99968 \\
+            1e-200 & -1e200 & 1e-200 & $\approx 1$e400 & $\approx 1$e-400 & $\approx 1$e-400 & $\approx 1$e-400 \\
+            \bottomrule
+            \end{tabular}
+        \end{center}
+
+        I believe there is a slight discrepancy in the \((a,b,c) = (1,-8,15.99999999)\) case because of discrepancies in the initially defined coefficients. The reference solutions more accurately calculate the roots to a polynomial defined by \((a,b,c) = (1,-8,16+\varepsilon)\) where \(O(\varepsilon) < O(10^{-8})\).
+    \end{enumerate}
 
 \end{enumerate}
 
