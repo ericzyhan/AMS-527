@@ -21,7 +21,6 @@ You'll need **Python** and **Jupyter** installed on your system. Using a virtual
     If you're using Git, you can clone the repository from the command line:
     ```
     git clone [https://github.com/your-username/HW1.git](https://github.com/your-username/HW 1.git)
-    cd HW 1\Code
     ```
 
 2.  **Install the required libraries:**
