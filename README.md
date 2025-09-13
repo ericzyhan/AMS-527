@@ -37,7 +37,7 @@ You'll need **Python** and **Jupyter** installed on your system. Using a virtual
 
 1.  **Launch Jupyter Notebook:**
 
-    From the `HW1` directory, start the Jupyter Notebook server by running:
+    From the `HW 1\Code` directory, start the Jupyter Notebook server by running:
     ```
     jupyter notebook
     ```
@@ -45,7 +45,7 @@ You'll need **Python** and **Jupyter** installed on your system. Using a virtual
 
 2.  **Open the notebook:**
 
-    Navigate to and open the `HW1_notebook.ipynb` file in the Jupyter interface.
+    Navigate to and open the `Homework 1.ipynb` file in the Jupyter interface.
 
 3.  **Execute the cells:**
 
