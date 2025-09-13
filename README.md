@@ -4,7 +4,7 @@
 
 ## Overview
 
-This repository contains the code for **Homework 1**, which focuses on **numerical experiments**. The core of the assignment is a **Jupyter Notebook** file (`Homework 1.ipynb`), which includes all the code required to reproduce the results. For the experiments to run correctly, you must execute the code cells sequentially. The notebook contains detailed comments to guide you through the process and explain the purpose of each section.
+This repository contains the code for **Homework 1**.  For the experiments to run correctly, you must execute the code cells sequentially. The Jupyter notebook contains detailed comments to guide you through the process and explain the purpose of each section.
 
 ---
 
